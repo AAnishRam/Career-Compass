@@ -138,8 +138,12 @@ export default function Results() {
           }))
       : [];
 
-  const matchedCount = analysis.matchedSkills.length;
-  const missingCount = analysis.missingSkills.length;
+  // Calculate counts from skillsData for consistency
+  const matchedCount = skillsData.filter((s) => s.percentage >= 70).length;
+  const partialCount = skillsData.filter(
+    (s) => s.percentage >= 40 && s.percentage < 70
+  ).length;
+  const missingCount = skillsData.filter((s) => s.percentage < 40).length;
 
   return (
     <MainLayout>
@@ -182,80 +186,78 @@ export default function Results() {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Overview */}
-          <div className="space-y-6">
-            <MatchOverview
-              overallScore={currentJob.matchScore}
-              matchedSkills={matchedCount}
-              partialSkills={0}
-              missingSkills={missingCount}
-            />
+        {/* Main Content - Single Column Layout */}
+        <div className="max-w-4xl mx-auto space-y-6">
+          {/* 1. Match Overview Card */}
+          <MatchOverview
+            overallScore={currentJob.matchScore}
+            matchedSkills={matchedCount}
+            partialSkills={partialCount}
+            missingSkills={missingCount}
+          />
 
-            {/* Strengths */}
-            {analysis.strengths.length > 0 && (
-              <div className="glass-card rounded-xl p-6">
-                <h3 className="font-display font-semibold text-foreground mb-4">
-                  Your Strengths
-                </h3>
-                <ul className="space-y-2">
-                  {analysis.strengths.map((strength, index) => (
-                    <li
-                      key={index}
-                      className="text-sm text-muted-foreground flex items-start gap-2"
-                    >
-                      <span className="text-primary mt-0.5">✓</span>
-                      <span>{strength}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+          {/* 2. Your Strengths */}
+          {analysis.strengths.length > 0 && (
+            <div className="glass-card rounded-xl p-6">
+              <h3 className="font-display font-semibold text-foreground mb-4">
+                Your Strengths
+              </h3>
+              <ul className="space-y-2">
+                {analysis.strengths.map((strength, index) => (
+                  <li
+                    key={index}
+                    className="text-sm text-muted-foreground flex items-start gap-2"
+                  >
+                    <span className="text-primary mt-0.5">✓</span>
+                    <span>{strength}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-            {/* Areas for Improvement */}
-            {analysis.improvements.length > 0 && (
-              <div className="glass-card rounded-xl p-6">
-                <h3 className="font-display font-semibold text-foreground mb-4">
-                  Areas to Improve
-                </h3>
-                <ul className="space-y-2">
-                  {analysis.improvements.map((improvement, index) => (
-                    <li
-                      key={index}
-                      className="text-sm text-muted-foreground flex items-start gap-2"
-                    >
-                      <span className="text-warning mt-0.5">→</span>
-                      <span>{improvement}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
+          {/* 3. Areas for Improvement */}
+          {analysis.improvements.length > 0 && (
+            <div className="glass-card rounded-xl p-6">
+              <h3 className="font-display font-semibold text-foreground mb-4">
+                Areas to Improve
+              </h3>
+              <ul className="space-y-2">
+                {analysis.improvements.map((improvement, index) => (
+                  <li
+                    key={index}
+                    className="text-sm text-muted-foreground flex items-start gap-2"
+                  >
+                    <span className="text-warning mt-0.5">→</span>
+                    <span>{improvement}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-          {/* Middle Column - Skills Breakdown */}
-          <div className="lg:col-span-2 space-y-6">
-            <h2 className="text-xl font-display font-semibold text-foreground">
+          {/* 4. Skills Breakdown */}
+          <div>
+            <h2 className="text-xl font-display font-semibold text-foreground mb-4">
               Skills Breakdown
             </h2>
             <SkillsBreakdown skills={skillsData} />
           </div>
-        </div>
 
-        {/* Recommendations Section */}
-        {recommendationsData.length > 0 && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-display font-semibold text-foreground">
-              Recommendations
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {recommendationsData.map((rec, index) => (
-                <RecommendationCard key={index} {...rec} />
-              ))}
+          {/* 5. Recommendations */}
+          {recommendationsData.length > 0 && (
+            <div>
+              <h2 className="text-xl font-display font-semibold text-foreground mb-4">
+                Recommendations
+              </h2>
+              <div className="space-y-4">
+                {recommendationsData.map((rec, index) => (
+                  <RecommendationCard key={index} {...rec} />
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </MainLayout>
   );
