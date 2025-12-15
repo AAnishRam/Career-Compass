@@ -37,7 +37,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 export default function Settings() {
-  const { logout } = useAuth();
+  const { logout, updateUser } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -72,7 +72,12 @@ export default function Settings() {
     mutationFn: updateUserProfile,
     onSuccess: (data) => {
       queryClient.setQueryData(["user-profile"], data);
-      setIsEditingProfile(false);
+      // Update AuthContext to reflect changes in sidebar
+      updateUser({
+        id: data.id,
+        name: data.name,
+        email: data.email,
+      });
       toast.success("Profile updated successfully!");
     },
     onError: () => {
@@ -228,9 +233,7 @@ export default function Settings() {
                     id="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    disabled={
-                      !isEditingProfile || updateProfileMutation.isPending
-                    }
+                    disabled={updateProfileMutation.isPending}
                     className="bg-background border-border"
                   />
                 </div>
@@ -261,48 +264,23 @@ export default function Settings() {
                   />
                 </div>
 
-                <div className="flex gap-3">
-                  {!isEditingProfile ? (
-                    <Button
-                      type="button"
-                      onClick={() => setIsEditingProfile(true)}
-                      className="gradient-primary"
-                    >
-                      Edit Profile
-                    </Button>
+                <Button
+                  type="submit"
+                  disabled={updateProfileMutation.isPending}
+                  className="gradient-primary"
+                >
+                  {updateProfileMutation.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
                   ) : (
                     <>
-                      <Button
-                        type="submit"
-                        disabled={updateProfileMutation.isPending}
-                        className="gradient-primary"
-                      >
-                        {updateProfileMutation.isPending ? (
-                          <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Saving...
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle2 className="h-4 w-4 mr-2" />
-                            Save Changes
-                          </>
-                        )}
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => {
-                          setName(profile?.name || "");
-                          setIsEditingProfile(false);
-                        }}
-                        disabled={updateProfileMutation.isPending}
-                      >
-                        Cancel
-                      </Button>
+                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                      Save Changes
                     </>
                   )}
-                </div>
+                </Button>
               </form>
             </div>
           </TabsContent>
