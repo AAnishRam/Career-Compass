@@ -32,7 +32,7 @@ export async function analyzeJobMatch(
   resumeContent: string,
   userSkills: string[]
 ): Promise<JobAnalysisResult> {
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
   const prompt = getPrompt("job-analysis", {
     jobDescription,
@@ -62,7 +62,7 @@ export async function analyzeJobMatch(
 export async function extractSkillsFromResume(
   resumeContent: string
 ): Promise<string[]> {
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
   const prompt = getPrompt("skills-extraction", {
     resumeContent,

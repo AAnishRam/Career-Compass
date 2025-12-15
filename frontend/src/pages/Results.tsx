@@ -3,52 +3,115 @@ import { MatchOverview } from "@/components/results/MatchOverview";
 import { SkillsBreakdown } from "@/components/results/SkillsBreakdown";
 import { RecommendationCard } from "@/components/results/RecommendationCard";
 import { Button } from "@/components/ui/button";
-import { Download, Share2, RotateCcw, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
-
-const mockSkills = [
-  { name: "React.js", percentage: 100, status: "matched" as const, category: "Technical Skills" },
-  { name: "TypeScript", percentage: 95, status: "matched" as const, category: "Technical Skills" },
-  { name: "Node.js", percentage: 75, status: "partial" as const, category: "Technical Skills" },
-  { name: "GraphQL", percentage: 60, status: "partial" as const, category: "Technical Skills" },
-  { name: "AWS", percentage: 30, status: "missing" as const, category: "Technical Skills" },
-  { name: "Team Leadership", percentage: 85, status: "matched" as const, category: "Soft Skills" },
-  { name: "Communication", percentage: 90, status: "matched" as const, category: "Soft Skills" },
-  { name: "Agile/Scrum", percentage: 70, status: "partial" as const, category: "Methodology" },
-  { name: "CI/CD", percentage: 55, status: "partial" as const, category: "Methodology" },
-];
-
-const mockRecommendations = [
-  {
-    title: "Highlight React Experience",
-    description: "Your React skills are a strong match. Emphasize specific projects and achievements in your application.",
-    type: "highlight" as const,
-    priority: "high" as const,
-  },
-  {
-    title: "Learn AWS Basics",
-    description: "Consider getting AWS Cloud Practitioner certification to fill this common requirement gap.",
-    type: "learn" as const,
-    priority: "high" as const,
-  },
-  {
-    title: "Strengthen Node.js Portfolio",
-    description: "Add more backend projects to demonstrate full-stack capabilities.",
-    type: "improve" as const,
-    priority: "medium" as const,
-  },
-  {
-    title: "Mention GraphQL Experience",
-    description: "Even partial experience with GraphQL is valuable. Include any relevant projects.",
-    type: "action" as const,
-    priority: "low" as const,
-  },
-];
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Download,
+  Share2,
+  RotateCcw,
+  ArrowLeft,
+  AlertCircle,
+} from "lucide-react";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { getJobAnalyses, getJobAnalysis } from "@/services/jobs.service";
 
 export default function Results() {
-  const matchedCount = mockSkills.filter(s => s.status === "matched").length;
-  const partialCount = mockSkills.filter(s => s.status === "partial").length;
-  const missingCount = mockSkills.filter(s => s.status === "missing").length;
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const jobId = searchParams.get("jobId");
+
+  // Fetch all job analyses if no specific ID
+  const { data: allJobs = [], isLoading: jobsLoading } = useQuery({
+    queryKey: ["jobAnalyses"],
+    queryFn: getJobAnalyses,
+    enabled: !jobId,
+  });
+
+  // Fetch specific job analysis if ID provided
+  const {
+    data: specificJob,
+    isLoading: specificJobLoading,
+    error: jobError,
+  } = useQuery({
+    queryKey: ["jobAnalysis", jobId],
+    queryFn: () => getJobAnalysis(jobId!),
+    enabled: !!jobId,
+  });
+
+  // Use either the specific job or the most recent one
+  const currentJob = specificJob || allJobs[0];
+  const isLoading = jobId ? specificJobLoading : jobsLoading;
+
+  // Note: Recommendations are included in the analysis result
+  // No separate fetch needed
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="max-w-7xl mx-auto space-y-8">
+          <Skeleton className="h-20 w-full" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <Skeleton className="h-64" />
+            <div className="lg:col-span-2">
+              <Skeleton className="h-96" />
+            </div>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (jobError || !currentJob) {
+    return (
+      <MainLayout>
+        <div className="max-w-7xl mx-auto">
+          <div className="glass-card rounded-xl p-8 text-center">
+            <AlertCircle className="h-12 w-12 mx-auto text-destructive mb-4" />
+            <h2 className="text-xl font-semibold text-foreground mb-2">
+              Analysis Not Found
+            </h2>
+            <p className="text-muted-foreground mb-6">
+              {jobError
+                ? "Failed to load job analysis"
+                : "No job analyses found. Start by analyzing a job posting."}
+            </p>
+            <Link to="/analyze">
+              <Button className="gradient-primary">Analyze New Job</Button>
+            </Link>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  const analysis = currentJob.analysisResult;
+
+  // Transform skills data for SkillsBreakdown component
+  const skillsData = [
+    ...analysis.matchedSkills.map((skill) => ({
+      name: skill,
+      percentage: 100,
+      status: "matched" as const,
+      category: "Matched Skills",
+    })),
+    ...analysis.missingSkills.map((skill) => ({
+      name: skill,
+      percentage: 0,
+      status: "missing" as const,
+      category: "Missing Skills",
+    })),
+  ];
+
+  // Transform recommendations
+  const recommendationsData = analysis.recommendations.map((rec, index) => ({
+    title: `Recommendation ${index + 1}`,
+    description: rec,
+    type: "improve" as const,
+    priority: index < 2 ? ("high" as const) : ("medium" as const),
+  }));
+
+  const matchedCount = analysis.matchedSkills.length;
+  const missingCount = analysis.missingSkills.length;
 
   return (
     <MainLayout>
@@ -56,17 +119,29 @@ export default function Results() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <Link to="/analyze" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mb-2">
+            <Link
+              to="/analyze"
+              className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mb-2"
+            >
               <ArrowLeft className="h-4 w-4" />
               Back to Analysis
             </Link>
-            <h1 className="text-3xl font-display font-bold text-foreground">Match Results</h1>
-            <p className="text-muted-foreground mt-1">Senior Frontend Developer at TechCorp Inc.</p>
+            <h1 className="text-3xl font-display font-bold text-foreground">
+              Match Results
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              {currentJob.jobTitle} at {currentJob.company}
+              {currentJob.location && ` • ${currentJob.location}`}
+            </p>
           </div>
           <div className="flex gap-3">
-            <Button variant="outline" className="gap-2">
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => navigate("/analyze")}
+            >
               <RotateCcw className="h-4 w-4" />
-              Re-analyze
+              New Analysis
             </Button>
             <Button variant="outline" className="gap-2">
               <Share2 className="h-4 w-4" />
@@ -83,30 +158,76 @@ export default function Results() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Overview */}
           <div className="space-y-6">
-            <MatchOverview 
-              overallScore={78}
+            <MatchOverview
+              overallScore={currentJob.matchScore}
               matchedSkills={matchedCount}
-              partialSkills={partialCount}
+              partialSkills={0}
               missingSkills={missingCount}
             />
+
+            {/* Strengths */}
+            {analysis.strengths.length > 0 && (
+              <div className="glass-card rounded-xl p-6">
+                <h3 className="font-display font-semibold text-foreground mb-4">
+                  Your Strengths
+                </h3>
+                <ul className="space-y-2">
+                  {analysis.strengths.map((strength, index) => (
+                    <li
+                      key={index}
+                      className="text-sm text-muted-foreground flex items-start gap-2"
+                    >
+                      <span className="text-primary mt-0.5">✓</span>
+                      <span>{strength}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Areas for Improvement */}
+            {analysis.improvements.length > 0 && (
+              <div className="glass-card rounded-xl p-6">
+                <h3 className="font-display font-semibold text-foreground mb-4">
+                  Areas to Improve
+                </h3>
+                <ul className="space-y-2">
+                  {analysis.improvements.map((improvement, index) => (
+                    <li
+                      key={index}
+                      className="text-sm text-muted-foreground flex items-start gap-2"
+                    >
+                      <span className="text-warning mt-0.5">→</span>
+                      <span>{improvement}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
 
           {/* Middle Column - Skills Breakdown */}
           <div className="lg:col-span-2 space-y-6">
-            <h2 className="text-xl font-display font-semibold text-foreground">Skills Breakdown</h2>
-            <SkillsBreakdown skills={mockSkills} />
+            <h2 className="text-xl font-display font-semibold text-foreground">
+              Skills Breakdown
+            </h2>
+            <SkillsBreakdown skills={skillsData} />
           </div>
         </div>
 
         {/* Recommendations Section */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-display font-semibold text-foreground">Recommendations</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {mockRecommendations.map((rec, index) => (
-              <RecommendationCard key={index} {...rec} />
-            ))}
+        {recommendationsData.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-xl font-display font-semibold text-foreground">
+              Recommendations
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {recommendationsData.map((rec, index) => (
+                <RecommendationCard key={index} {...rec} />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </MainLayout>
   );

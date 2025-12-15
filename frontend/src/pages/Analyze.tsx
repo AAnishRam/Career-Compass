@@ -32,12 +32,6 @@ const features = [
 
 export default function Analyze() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    jobTitle: "",
-    company: "",
-    location: "",
-    jobDescription: "",
-  });
 
   const analyzeMutation = useMutation({
     mutationFn: analyzeJob,
@@ -52,18 +46,16 @@ export default function Analyze() {
   });
 
   const handleAnalyze = (data: {
+    jobTitle: string;
+    company: string;
+    location?: string;
     jobDescription: string;
     resumeText: string;
   }) => {
-    // Extract job title and company from description (simple heuristic)
-    const lines = data.jobDescription.split("\n").filter((line) => line.trim());
-    const jobTitle = lines[0]?.trim() || "Job Position";
-    const company = lines[1]?.trim() || "Company";
-
     analyzeMutation.mutate({
-      jobTitle,
-      company,
-      location: formData.location || undefined,
+      jobTitle: data.jobTitle,
+      company: data.company,
+      location: data.location,
       jobDescription: data.jobDescription,
     });
   };

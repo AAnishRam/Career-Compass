@@ -16,7 +16,13 @@ import { uploadResume } from "@/services/resume.service";
 import { toast } from "sonner";
 
 interface JobInputFormProps {
-  onAnalyze: (data: { jobDescription: string; resumeText: string }) => void;
+  onAnalyze: (data: {
+    jobTitle: string;
+    company: string;
+    location?: string;
+    jobDescription: string;
+    resumeText: string;
+  }) => void;
   isLoading?: boolean;
 }
 
@@ -24,6 +30,9 @@ export function JobInputForm({
   onAnalyze,
   isLoading = false,
 }: JobInputFormProps) {
+  const [jobTitle, setJobTitle] = useState("");
+  const [company, setCompany] = useState("");
+  const [location, setLocation] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [resumeText, setResumeText] = useState("");
   const [activeTab, setActiveTab] = useState<"paste" | "upload" | "url">(
@@ -36,7 +45,13 @@ export function JobInputForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onAnalyze({ jobDescription, resumeText });
+    onAnalyze({
+      jobTitle,
+      company,
+      location: location || undefined,
+      jobDescription,
+      resumeText,
+    });
   };
 
   const handleFileSelect = async (file: File) => {
@@ -125,7 +140,7 @@ export function JobInputForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      {/* Job Description Section */}
+      {/* Job Details Section */}
       <div className="glass-card rounded-xl p-6 space-y-4 animate-slide-up">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-primary/10">
@@ -133,21 +148,86 @@ export function JobInputForm({
           </div>
           <div>
             <h3 className="font-display font-semibold text-foreground">
-              Job Description
+              Job Details
             </h3>
             <p className="text-sm text-muted-foreground">
-              Paste the job posting you want to analyze
+              Enter the job information
             </p>
           </div>
         </div>
 
-        <Textarea
-          placeholder="Paste the complete job description here..."
-          className="min-h-[200px] resize-none bg-background/50 border-border focus:border-primary"
-          value={jobDescription}
-          onChange={(e) => setJobDescription(e.target.value)}
-          disabled={isLoading}
-        />
+        {/* Job Title and Company */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label
+              htmlFor="jobTitle"
+              className="text-sm font-medium text-foreground"
+            >
+              Job Title <span className="text-destructive">*</span>
+            </label>
+            <Input
+              id="jobTitle"
+              placeholder="e.g., Senior Frontend Developer"
+              value={jobTitle}
+              onChange={(e) => setJobTitle(e.target.value)}
+              disabled={isLoading || isUploading}
+              className="bg-background/50 border-border focus:border-primary"
+            />
+          </div>
+          <div className="space-y-2">
+            <label
+              htmlFor="company"
+              className="text-sm font-medium text-foreground"
+            >
+              Company <span className="text-destructive">*</span>
+            </label>
+            <Input
+              id="company"
+              placeholder="e.g., Google"
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              disabled={isLoading || isUploading}
+              className="bg-background/50 border-border focus:border-primary"
+            />
+          </div>
+        </div>
+
+        {/* Location */}
+        <div className="space-y-2">
+          <label
+            htmlFor="location"
+            className="text-sm font-medium text-foreground"
+          >
+            Location{" "}
+            <span className="text-muted-foreground text-xs">(Optional)</span>
+          </label>
+          <Input
+            id="location"
+            placeholder="e.g., San Francisco, CA or Remote"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            disabled={isLoading || isUploading}
+            className="bg-background/50 border-border focus:border-primary"
+          />
+        </div>
+
+        {/* Job Description */}
+        <div className="space-y-2">
+          <label
+            htmlFor="jobDescription"
+            className="text-sm font-medium text-foreground"
+          >
+            Job Description <span className="text-destructive">*</span>
+          </label>
+          <Textarea
+            id="jobDescription"
+            placeholder="Paste the complete job description here..."
+            className="min-h-[200px] resize-none bg-background/50 border-border focus:border-primary"
+            value={jobDescription}
+            onChange={(e) => setJobDescription(e.target.value)}
+            disabled={isLoading || isUploading}
+          />
+        </div>
       </div>
 
       {/* Resume Section */}
@@ -300,6 +380,8 @@ export function JobInputForm({
         size="lg"
         className="w-full gradient-primary text-primary-foreground font-semibold py-6 text-base hover:opacity-90 transition-opacity"
         disabled={
+          !jobTitle.trim() ||
+          !company.trim() ||
           !jobDescription.trim() ||
           !resumeText.trim() ||
           isLoading ||
