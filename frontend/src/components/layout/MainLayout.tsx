@@ -16,7 +16,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         onToggle={() => setSidebarOpen(!sidebarOpen)}
       />
       <main className="lg:ml-64 lg:pl-4 transition-all duration-300">
-        <div className="bg-background rounded-xl sm:rounded-2xl min-h-[calc(100vh-1rem)] sm:min-h-[calc(100vh-2rem)] p-4 sm:p-6 lg:p-8 shadow-subtle">
+        <div className="bg-background rounded-xl sm:rounded-2xl min-h-[calc(100vh-1rem)] sm:min-h-[calc(100vh-2rem)] p-4 pt-16 sm:p-6 sm:pt-20 lg:p-8 shadow-subtle">
           {children}
         </div>
       </main>

@@ -59,9 +59,9 @@ export function AppSidebar({ isOpen, onClose, onToggle }: AppSidebarProps) {
     <>
       {/* Mobile Menu Button */}
       <Button
-        variant="outline"
+        variant="ghost"
         size="icon"
-        className="fixed top-6 left-4 z-50 lg:hidden bg-background shadow-md"
+        className="fixed top-6 left-4 z-50 lg:hidden bg-sidebar/80 backdrop-blur-sm border border-sidebar-border hover:bg-sidebar shadow-md text-primary hover:text-primary"
         onClick={onToggle}
       >
         {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
