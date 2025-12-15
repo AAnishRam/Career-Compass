@@ -18,7 +18,7 @@ import { getJobAnalyses, getJobAnalysis } from "@/services/jobs.service";
 export default function Results() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const jobId = searchParams.get("jobId");
+  const jobId = searchParams.get("id"); // Changed from "jobId" to "id"
 
   // Fetch all job analyses if no specific ID
   const { data: allJobs = [], isLoading: jobsLoading } = useQuery({
