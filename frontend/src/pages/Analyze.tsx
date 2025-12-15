@@ -64,10 +64,10 @@ export default function Analyze() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-10">
-          <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-foreground">
             Analyze Job <span className="text-gradient">Match</span>
           </h1>
-          <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-muted-foreground mt-3 max-w-2xl mx-auto px-4">
             Paste a job description and your resume to get an instant analysis
             of how well you match the requirements.
           </p>

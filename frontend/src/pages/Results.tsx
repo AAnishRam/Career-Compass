@@ -149,30 +149,30 @@ export default function Results() {
               <ArrowLeft className="h-4 w-4" />
               Back to Analysis
             </Link>
-            <h1 className="text-3xl font-display font-bold text-foreground">
+            <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground">
               Match Results
             </h1>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
               {currentJob.jobTitle} at {currentJob.company}
               {currentJob.location && ` • ${currentJob.location}`}
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             <Button
               variant="outline"
-              className="gap-2"
+              className="gap-2 flex-1 sm:flex-none"
               onClick={() => navigate("/analyze")}
             >
               <RotateCcw className="h-4 w-4" />
-              New Analysis
+              <span className="hidden sm:inline">New Analysis</span>
             </Button>
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="gap-2 flex-1 sm:flex-none">
               <Share2 className="h-4 w-4" />
-              Share
+              <span className="hidden sm:inline">Share</span>
             </Button>
-            <Button className="gradient-primary text-primary-foreground gap-2">
+            <Button className="gradient-primary text-primary-foreground gap-2 flex-1 sm:flex-none">
               <Download className="h-4 w-4" />
-              Export PDF
+              <span className="hidden sm:inline">Export PDF</span>
             </Button>
           </div>
         </div>

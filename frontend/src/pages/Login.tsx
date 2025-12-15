@@ -17,7 +17,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import logoImage from "@/assests/logo.png";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -61,9 +62,11 @@ export default function Login() {
       <Card className="w-full max-w-md glass-card">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
-            <div className="p-3 rounded-full bg-primary/10">
-              <Sparkles className="h-8 w-8 text-primary" />
-            </div>
+            <img
+              src={logoImage}
+              alt="Career Compass Logo"
+              className="h-16 w-16 object-contain"
+            />
           </div>
           <CardTitle className="text-2xl font-display font-bold">
             Welcome Back

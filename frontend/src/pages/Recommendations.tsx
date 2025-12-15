@@ -160,10 +160,10 @@ export default function Recommendations() {
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-display font-bold text-foreground">
+          <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground">
             Career Recommendations
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             Track your progress on personalized career development
             recommendations
           </p>
@@ -380,9 +380,9 @@ function RecommendationCard({
       )}
     >
       {/* Header */}
-      <div className="flex items-start justify-between gap-4 mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
             <h3 className="font-display font-semibold text-foreground">
               {rec.title}
             </h3>
@@ -390,7 +390,7 @@ function RecommendationCard({
               {rec.priority}
             </span>
           </div>
-          <p className="text-sm text-muted-foreground mb-2">
+          <p className="text-xs sm:text-sm text-muted-foreground mb-2">
             From: {rec.jobTitle} at {rec.company}
           </p>
           <p className="text-sm text-foreground">{rec.description}</p>
@@ -403,7 +403,7 @@ function RecommendationCard({
         >
           <SelectTrigger
             className={cn(
-              "w-[140px]",
+              "w-full sm:w-[140px]",
               statusConfig[rec.status].bg,
               statusConfig[rec.status].color
             )}

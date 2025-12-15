@@ -107,14 +107,14 @@ export default function Skills() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-display font-bold text-foreground">
+            <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground">
               Skills Profile
             </h1>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
               Track and manage your skill levels
             </p>
           </div>
-          <Button className="gradient-primary text-primary-foreground gap-2">
+          <Button className="gradient-primary text-primary-foreground gap-2 w-full sm:w-auto">
             <Plus className="h-4 w-4" />
             Add Skill
           </Button>
