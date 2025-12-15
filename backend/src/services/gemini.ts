@@ -20,9 +20,27 @@ export interface JobAnalysisResult {
   matchScore: number;
   status: "excellent" | "good" | "fair" | "poor";
   requiredSkills: string[];
+  skillsAnalysis: Array<{
+    skill: string;
+    required: boolean;
+    possessed: boolean;
+    matchPercentage: number;
+    proficiencyLevel: "beginner" | "intermediate" | "advanced" | "expert";
+    notes: string;
+  }>;
   matchedSkills: string[];
   missingSkills: string[];
-  recommendations: string[];
+  recommendations: Array<{
+    title: string;
+    description: string;
+    priority: "high" | "medium" | "low";
+    actionItems: string[];
+    resources: Array<{
+      title: string;
+      url: string;
+      type: "course" | "article" | "documentation" | "certification";
+    }>;
+  }>;
   strengths: string[];
   improvements: string[];
 }

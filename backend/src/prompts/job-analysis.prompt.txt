@@ -14,9 +14,33 @@ Please provide a detailed analysis in the following JSON format:
   "matchScore": <number 0-100>,
   "status": "<excellent|good|fair|poor>",
   "requiredSkills": [<array of skills required for the job>],
+  "skillsAnalysis": [
+    {
+      "skill": "<skill name>",
+      "required": <boolean>,
+      "possessed": <boolean>,
+      "matchPercentage": <number 0-100>,
+      "proficiencyLevel": "<beginner|intermediate|advanced|expert>",
+      "notes": "<brief note about this skill match>"
+    }
+  ],
   "matchedSkills": [<array of candidate's skills that match job requirements>],
   "missingSkills": [<array of required skills the candidate is missing>],
-  "recommendations": [<array of specific recommendations to improve candidacy>],
+  "recommendations": [
+    {
+      "title": "<recommendation title>",
+      "description": "<detailed recommendation>",
+      "priority": "<high|medium|low>",
+      "actionItems": [<array of specific action items>],
+      "resources": [
+        {
+          "title": "<resource/course title>",
+          "url": "<URL to course/resource>",
+          "type": "<course|article|documentation|certification>"
+        }
+      ]
+    }
+  ],
   "strengths": [<array of candidate's key strengths for this role>],
   "improvements": [<array of areas where candidate should improve>]
 }
@@ -26,5 +50,18 @@ Guidelines for matchScore:
 - 75-89: Good match (status: "good")
 - 60-74: Fair match (status: "fair")
 - Below 60: Poor match (status: "poor")
+
+Guidelines for skillsAnalysis:
+- For each skill mentioned in job description or resume, provide a match percentage
+- matchPercentage should reflect how well the candidate's experience matches the job requirement
+- If skill is in resume but not required: matchPercentage based on relevance
+- If skill is required but not in resume: matchPercentage = 0
+- If skill is both required and possessed: matchPercentage = 60-100 based on proficiency
+
+Guidelines for recommendations:
+- Provide 3-5 actionable recommendations
+- Include real, accessible course links (Coursera, Udemy, freeCodeCamp, YouTube, official docs)
+- Prioritize free or affordable resources
+- Focus on missing skills and areas for improvement
 
 Return ONLY valid JSON, no additional text.

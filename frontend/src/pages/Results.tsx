@@ -86,29 +86,54 @@ export default function Results() {
 
   const analysis = currentJob.analysisResult;
 
-  // Transform skills data for SkillsBreakdown component
-  const skillsData = [
-    ...analysis.matchedSkills.map((skill) => ({
-      name: skill,
-      percentage: 100,
-      status: "matched" as const,
-      category: "Matched Skills",
-    })),
-    ...analysis.missingSkills.map((skill) => ({
-      name: skill,
-      percentage: 0,
-      status: "missing" as const,
-      category: "Missing Skills",
-    })),
-  ];
+  // Use skillsAnalysis if available, otherwise fall back to old format
+  const skillsData = analysis.skillsAnalysis
+    ? analysis.skillsAnalysis.map((skill) => ({
+        name: skill.skill,
+        percentage: skill.matchPercentage,
+        status:
+          skill.matchPercentage >= 70
+            ? ("matched" as const)
+            : skill.matchPercentage >= 40
+            ? ("partial" as const)
+            : ("missing" as const),
+        category: skill.required ? "Required Skills" : "Additional Skills",
+      }))
+    : [
+        ...analysis.matchedSkills.map((skill) => ({
+          name: skill,
+          percentage: 100,
+          status: "matched" as const,
+          category: "Matched Skills",
+        })),
+        ...analysis.missingSkills.map((skill) => ({
+          name: skill,
+          percentage: 0,
+          status: "missing" as const,
+          category: "Missing Skills",
+        })),
+      ];
 
-  // Transform recommendations
-  const recommendationsData = analysis.recommendations.map((rec, index) => ({
-    title: `Recommendation ${index + 1}`,
-    description: rec,
-    type: "improve" as const,
-    priority: index < 2 ? ("high" as const) : ("medium" as const),
-  }));
+  // Transform recommendations - handle both old and new format
+  const recommendationsData =
+    Array.isArray(analysis.recommendations) &&
+    analysis.recommendations.length > 0
+      ? typeof analysis.recommendations[0] === "string"
+        ? analysis.recommendations.map((rec, index) => ({
+            title: `Recommendation ${index + 1}`,
+            description: rec,
+            type: "improve" as const,
+            priority: index < 2 ? ("high" as const) : ("medium" as const),
+          }))
+        : analysis.recommendations.map((rec: any) => ({
+            title: rec.title,
+            description: rec.description,
+            type: "improve" as const,
+            priority: rec.priority as "high" | "medium" | "low",
+            actionItems: rec.actionItems || [],
+            resources: rec.resources || [],
+          }))
+      : [];
 
   const matchedCount = analysis.matchedSkills.length;
   const missingCount = analysis.missingSkills.length;
