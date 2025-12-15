@@ -71,7 +71,7 @@ router.post("/analyze", authenticateToken, async (req: AuthRequest, res) => {
           userId: req.userId!,
           jobAnalysisId: jobAnalysis.id,
           recommendationType: "improvement",
-          content: rec,
+          content: JSON.stringify(rec),
         }))
       );
     }
