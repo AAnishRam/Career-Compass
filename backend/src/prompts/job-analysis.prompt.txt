@@ -1,0 +1,30 @@
+You are an expert career advisor and resume analyst. Analyze the following job description against the candidate's resume and skills.
+
+JOB DESCRIPTION:
+{{jobDescription}}
+
+CANDIDATE'S RESUME:
+{{resumeContent}}
+
+CANDIDATE'S SKILLS:
+{{userSkills}}
+
+Please provide a detailed analysis in the following JSON format:
+{
+  "matchScore": <number 0-100>,
+  "status": "<excellent|good|fair|poor>",
+  "requiredSkills": [<array of skills required for the job>],
+  "matchedSkills": [<array of candidate's skills that match job requirements>],
+  "missingSkills": [<array of required skills the candidate is missing>],
+  "recommendations": [<array of specific recommendations to improve candidacy>],
+  "strengths": [<array of candidate's key strengths for this role>],
+  "improvements": [<array of areas where candidate should improve>]
+}
+
+Guidelines for matchScore:
+- 90-100: Excellent match (status: "excellent")
+- 75-89: Good match (status: "good")
+- 60-74: Fair match (status: "fair")
+- Below 60: Poor match (status: "poor")
+
+Return ONLY valid JSON, no additional text.

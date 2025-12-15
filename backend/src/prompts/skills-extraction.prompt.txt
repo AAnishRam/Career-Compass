@@ -1,0 +1,9 @@
+Extract all technical skills, soft skills, and competencies from the following resume.
+Return ONLY a JSON array of skill names, nothing else.
+
+RESUME:
+{{resumeContent}}
+
+Example format: ["JavaScript", "React", "Communication", "Project Management"]
+
+Return ONLY the JSON array, no additional text.

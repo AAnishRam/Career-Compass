@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import * as dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import { getPrompt } from "../prompts/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -33,38 +34,11 @@ export async function analyzeJobMatch(
 ): Promise<JobAnalysisResult> {
   const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-  const prompt = `
-You are an expert career advisor and resume analyst. Analyze the following job description against the candidate's resume and skills.
-
-JOB DESCRIPTION:
-${jobDescription}
-
-CANDIDATE'S RESUME:
-${resumeContent}
-
-CANDIDATE'S SKILLS:
-${userSkills.join(", ")}
-
-Please provide a detailed analysis in the following JSON format:
-{
-  "matchScore": <number 0-100>,
-  "status": "<excellent|good|fair|poor>",
-  "requiredSkills": [<array of skills required for the job>],
-  "matchedSkills": [<array of candidate's skills that match job requirements>],
-  "missingSkills": [<array of required skills the candidate is missing>],
-  "recommendations": [<array of specific recommendations to improve candidacy>],
-  "strengths": [<array of candidate's key strengths for this role>],
-  "improvements": [<array of areas where candidate should improve>]
-}
-
-Guidelines for matchScore:
-- 90-100: Excellent match (status: "excellent")
-- 75-89: Good match (status: "good")
-- 60-74: Fair match (status: "fair")
-- Below 60: Poor match (status: "poor")
-
-Return ONLY valid JSON, no additional text.
-`;
+  const prompt = getPrompt("job-analysis", {
+    jobDescription,
+    resumeContent,
+    userSkills: userSkills.join(", "),
+  });
 
   try {
     const result = await model.generateContent(prompt);
@@ -90,17 +64,9 @@ export async function extractSkillsFromResume(
 ): Promise<string[]> {
   const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-  const prompt = `
-Extract all technical skills, soft skills, and competencies from the following resume.
-Return ONLY a JSON array of skill names, nothing else.
-
-RESUME:
-${resumeContent}
-
-Example format: ["JavaScript", "React", "Communication", "Project Management"]
-
-Return ONLY the JSON array, no additional text.
-`;
+  const prompt = getPrompt("skills-extraction", {
+    resumeContent,
+  });
 
   try {
     const result = await model.generateContent(prompt);
