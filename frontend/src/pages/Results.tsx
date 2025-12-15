@@ -98,6 +98,9 @@ export default function Results() {
             ? ("partial" as const)
             : ("missing" as const),
         category: skill.required ? "Required Skills" : "Additional Skills",
+        proficiencyLevel: skill.proficiencyLevel,
+        notes: skill.notes,
+        required: skill.required,
       }))
     : [
         ...analysis.matchedSkills.map((skill) => ({
