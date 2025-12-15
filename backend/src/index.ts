@@ -17,6 +17,7 @@ import resumeRoutes from "./routes/resume.js";
 import skillsRoutes from "./routes/skills.js";
 import recommendationsRoutes from "./routes/recommendations.js";
 import statsRoutes from "./routes/stats.js";
+import userRoutes from "./routes/user.js";
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.use("/api/resume", resumeRoutes);
 app.use("/api/skills", skillsRoutes);
 app.use("/api/recommendations", recommendationsRoutes);
 app.use("/api/stats", statsRoutes);
+app.use("/api/user", userRoutes);
 
 // Health check
 app.get("/health", (req, res) => {
