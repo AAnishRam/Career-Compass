@@ -1,22 +1,126 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Upload, Link2, FileText, Sparkles } from "lucide-react";
+import {
+  Upload,
+  Link2,
+  FileText,
+  Sparkles,
+  Loader2,
+  X,
+  CheckCircle2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { uploadResume } from "@/services/resume.service";
+import { toast } from "sonner";
 
 interface JobInputFormProps {
   onAnalyze: (data: { jobDescription: string; resumeText: string }) => void;
+  isLoading?: boolean;
 }
 
-export function JobInputForm({ onAnalyze }: JobInputFormProps) {
+export function JobInputForm({
+  onAnalyze,
+  isLoading = false,
+}: JobInputFormProps) {
   const [jobDescription, setJobDescription] = useState("");
   const [resumeText, setResumeText] = useState("");
-  const [activeTab, setActiveTab] = useState<"paste" | "upload" | "url">("paste");
+  const [activeTab, setActiveTab] = useState<"paste" | "upload" | "url">(
+    "paste"
+  );
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onAnalyze({ jobDescription, resumeText });
+  };
+
+  const handleFileSelect = async (file: File) => {
+    // Validate file type
+    if (file.type !== "application/pdf" && file.type !== "text/plain") {
+      toast.error("Only PDF and text files are supported");
+      return;
+    }
+
+    // Validate file size (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File size must be less than 10MB");
+      return;
+    }
+
+    setUploadedFile(file);
+    setIsUploading(true);
+
+    try {
+      const response = await uploadResume(file);
+
+      // Show success message
+      if (response.resume.skillsExtracted > 0) {
+        toast.success(
+          `Resume uploaded! ${response.resume.skillsExtracted} skills extracted`
+        );
+      } else {
+        toast.success("Resume uploaded successfully!");
+      }
+
+      // Use the parsed content from the response
+      if (response.resume.parsedContent) {
+        setResumeText(response.resume.parsedContent);
+      } else {
+        // Fallback for text files
+        if (file.type === "text/plain") {
+          const text = await file.text();
+          setResumeText(text);
+        } else {
+          setResumeText(
+            `[PDF Resume: ${file.name}]\n\nYour resume has been uploaded and processed.`
+          );
+        }
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to upload resume");
+      setUploadedFile(null);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleFileSelect(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileSelect(file);
+    }
+  };
+
+  const removeFile = () => {
+    setUploadedFile(null);
+    setResumeText("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   return (
@@ -28,28 +132,40 @@ export function JobInputForm({ onAnalyze }: JobInputFormProps) {
             <FileText className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h3 className="font-display font-semibold text-foreground">Job Description</h3>
-            <p className="text-sm text-muted-foreground">Paste the job posting you want to analyze</p>
+            <h3 className="font-display font-semibold text-foreground">
+              Job Description
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Paste the job posting you want to analyze
+            </p>
           </div>
         </div>
-        
-        <Textarea 
+
+        <Textarea
           placeholder="Paste the complete job description here..."
           className="min-h-[200px] resize-none bg-background/50 border-border focus:border-primary"
           value={jobDescription}
           onChange={(e) => setJobDescription(e.target.value)}
+          disabled={isLoading}
         />
       </div>
 
       {/* Resume Section */}
-      <div className="glass-card rounded-xl p-6 space-y-4 animate-slide-up" style={{ animationDelay: "0.1s" }}>
+      <div
+        className="glass-card rounded-xl p-6 space-y-4 animate-slide-up"
+        style={{ animationDelay: "0.1s" }}
+      >
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-accent/10">
             <FileText className="h-5 w-5 text-accent" />
           </div>
           <div>
-            <h3 className="font-display font-semibold text-foreground">Your Resume</h3>
-            <p className="text-sm text-muted-foreground">Add your resume for matching analysis</p>
+            <h3 className="font-display font-semibold text-foreground">
+              Your Resume
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Add your resume for matching analysis
+            </p>
           </div>
         </div>
 
@@ -64,11 +180,13 @@ export function JobInputForm({ onAnalyze }: JobInputFormProps) {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
+              disabled={isLoading || isUploading}
               className={cn(
                 "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all",
-                activeTab === tab.id 
-                  ? "bg-background text-foreground shadow-sm" 
-                  : "text-muted-foreground hover:text-foreground"
+                activeTab === tab.id
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground",
+                (isLoading || isUploading) && "opacity-50 cursor-not-allowed"
               )}
             >
               <tab.icon className="h-4 w-4" />
@@ -78,41 +196,127 @@ export function JobInputForm({ onAnalyze }: JobInputFormProps) {
         </div>
 
         {activeTab === "paste" && (
-          <Textarea 
+          <Textarea
             placeholder="Paste your resume text here..."
             className="min-h-[200px] resize-none bg-background/50 border-border focus:border-primary"
             value={resumeText}
             onChange={(e) => setResumeText(e.target.value)}
+            disabled={isLoading || uploadedFile !== null}
           />
         )}
 
         {activeTab === "upload" && (
-          <div className="border-2 border-dashed border-border rounded-xl p-12 text-center hover:border-primary/50 transition-colors cursor-pointer">
-            <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-            <p className="font-medium text-foreground">Drop your resume here</p>
-            <p className="text-sm text-muted-foreground mt-1">or click to browse</p>
-            <p className="text-xs text-muted-foreground mt-3">PDF, DOCX, TXT up to 5MB</p>
+          <div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.txt"
+              onChange={handleFileInputChange}
+              className="hidden"
+              disabled={isUploading || isLoading}
+            />
+
+            {!uploadedFile ? (
+              <div
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onClick={() => fileInputRef.current?.click()}
+                className={cn(
+                  "border-2 border-dashed rounded-xl p-12 text-center transition-colors cursor-pointer",
+                  isDragging
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/50",
+                  (isUploading || isLoading) && "opacity-50 cursor-not-allowed"
+                )}
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 className="h-10 w-10 text-primary mx-auto mb-4 animate-spin" />
+                    <p className="font-medium text-foreground">
+                      Uploading and processing...
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Extracting skills with AI
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
+                    <p className="font-medium text-foreground">
+                      Drop your resume here
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      or click to browse
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-3">
+                      PDF or TXT up to 10MB
+                    </p>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="border-2 border-primary/50 rounded-xl p-6 bg-primary/5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-8 w-8 text-primary" />
+                    <div>
+                      <p className="font-medium text-foreground">
+                        {uploadedFile.name}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {(uploadedFile.size / 1024).toFixed(1)} KB
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={removeFile}
+                    disabled={isLoading || isUploading}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {activeTab === "url" && (
-          <Input 
+          <Input
             type="url"
             placeholder="https://linkedin.com/in/yourprofile"
             className="bg-background/50 border-border focus:border-primary"
+            disabled={isLoading || uploadedFile !== null}
           />
         )}
       </div>
 
       {/* Submit Button */}
-      <Button 
-        type="submit" 
+      <Button
+        type="submit"
         size="lg"
         className="w-full gradient-primary text-primary-foreground font-semibold py-6 text-base hover:opacity-90 transition-opacity"
-        disabled={!jobDescription.trim() || !resumeText.trim()}
+        disabled={
+          !jobDescription.trim() ||
+          !resumeText.trim() ||
+          isLoading ||
+          isUploading
+        }
       >
-        <Sparkles className="h-5 w-5 mr-2" />
-        Analyze Match
+        {isLoading ? (
+          <>
+            <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+            Analyzing...
+          </>
+        ) : (
+          <>
+            <Sparkles className="h-5 w-5 mr-2" />
+            Analyze Match
+          </>
+        )}
       </Button>
     </form>
   );

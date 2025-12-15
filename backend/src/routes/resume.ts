@@ -45,8 +45,17 @@ router.post(
         parsedContent = req.file.buffer.toString("utf-8");
       }
 
-      // Extract skills using Gemini AI
-      const extractedSkills = await extractSkillsFromResume(parsedContent);
+      // Try to extract skills using Gemini AI (optional - don't fail if this errors)
+      let extractedSkills: string[] = [];
+      try {
+        extractedSkills = await extractSkillsFromResume(parsedContent);
+      } catch (skillError) {
+        console.warn(
+          "Skill extraction failed, continuing without skills:",
+          skillError
+        );
+        // Continue without skills - not a critical error
+      }
 
       // Save resume to database
       const [resume] = await db
@@ -59,16 +68,21 @@ router.post(
         })
         .returning();
 
-      // Save skills to skills table
+      // Save skills to skills table (only if we have any)
       if (extractedSkills.length > 0) {
-        await db.insert(skills).values(
-          extractedSkills.map((skill) => ({
-            userId: req.userId!,
-            skillName: skill,
-            proficiencyLevel: 70, // Default proficiency
-            status: "matched" as const,
-          }))
-        );
+        try {
+          await db.insert(skills).values(
+            extractedSkills.map((skill) => ({
+              userId: req.userId!,
+              skillName: skill,
+              proficiencyLevel: 70, // Default proficiency
+              status: "matched" as const,
+            }))
+          );
+        } catch (skillDbError) {
+          console.warn("Failed to save skills to database:", skillDbError);
+          // Continue - resume is saved, skills can be added manually
+        }
       }
 
       res.status(201).json({
@@ -76,8 +90,13 @@ router.post(
           id: resume.id,
           fileName: resume.fileName,
           skillsExtracted: extractedSkills.length,
+          parsedContent: parsedContent.substring(0, 200) + "...", // Preview
         },
         skills: extractedSkills,
+        message:
+          extractedSkills.length === 0
+            ? "Resume uploaded successfully. Skills can be added manually."
+            : `Resume uploaded! ${extractedSkills.length} skills extracted.`,
       });
     } catch (error: any) {
       console.error("Resume upload error:", error);
