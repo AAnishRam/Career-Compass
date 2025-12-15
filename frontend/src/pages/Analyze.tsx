@@ -87,7 +87,7 @@ export default function Analyze() {
           {/* Features Sidebar */}
           <div className="space-y-4">
             <h3 className="font-display font-semibold text-foreground mb-4">
-              Why Use JobMatch?
+              Why Use Career Compass?
             </h3>
             {features.map((feature) => (
               <div

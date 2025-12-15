@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -10,10 +10,13 @@ import {
   Loader2,
   X,
   CheckCircle2,
+  FolderOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { uploadResume } from "@/services/resume.service";
+import { uploadResume, getResumes } from "@/services/resume.service";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { Resume } from "@/types";
 
 interface JobInputFormProps {
   onAnalyze: (data: {
@@ -35,13 +38,20 @@ export function JobInputForm({
   const [location, setLocation] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [resumeText, setResumeText] = useState("");
-  const [activeTab, setActiveTab] = useState<"paste" | "upload" | "url">(
-    "paste"
+  const [activeTab, setActiveTab] = useState<"paste" | "upload" | "select">(
+    "select"
   );
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [selectedResumeId, setSelectedResumeId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch user's resumes
+  const { data: resumes = [], isLoading: resumesLoading } = useQuery({
+    queryKey: ["resumes"],
+    queryFn: getResumes,
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,6 +138,12 @@ export function JobInputForm({
     if (file) {
       handleFileSelect(file);
     }
+  };
+
+  const handleResumeSelect = (resume: Resume) => {
+    setSelectedResumeId(resume.id);
+    setResumeText(resume.parsedContent || "");
+    toast.success(`Selected: ${resume.fileName}`);
   };
 
   const removeFile = () => {
@@ -252,9 +268,9 @@ export function JobInputForm({
         {/* Tabs */}
         <div className="flex gap-2 p-1 bg-muted rounded-lg w-fit">
           {[
+            { id: "select", label: "Select Resume", icon: FolderOpen },
             { id: "paste", label: "Paste Text", icon: FileText },
-            { id: "upload", label: "Upload", icon: Upload },
-            { id: "url", label: "URL", icon: Link2 },
+            { id: "upload", label: "Upload New", icon: Upload },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -274,6 +290,64 @@ export function JobInputForm({
             </button>
           ))}
         </div>
+
+        {/* Select Resume Tab */}
+        {activeTab === "select" && (
+          <div className="space-y-3">
+            {resumesLoading ? (
+              <div className="text-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+                <p className="text-sm text-muted-foreground mt-2">
+                  Loading resumes...
+                </p>
+              </div>
+            ) : resumes.length === 0 ? (
+              <div className="text-center py-8 border-2 border-dashed rounded-xl">
+                <FolderOpen className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+                <p className="font-medium text-foreground">No resumes found</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Upload a resume first to use this feature
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                {resumes.map((resume) => (
+                  <button
+                    key={resume.id}
+                    type="button"
+                    onClick={() => handleResumeSelect(resume)}
+                    disabled={isLoading}
+                    className={cn(
+                      "w-full text-left p-4 rounded-lg border-2 transition-all",
+                      selectedResumeId === resume.id
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/50 hover:bg-accent/5",
+                      isLoading && "opacity-50 cursor-not-allowed"
+                    )}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <FileText className="h-5 w-5 text-primary" />
+                        <div>
+                          <p className="font-medium text-foreground">
+                            {resume.fileName || "Untitled Resume"}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Uploaded{" "}
+                            {new Date(resume.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      {selectedResumeId === resume.id && (
+                        <CheckCircle2 className="h-5 w-5 text-primary" />
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {activeTab === "paste" && (
           <Textarea
@@ -362,15 +436,6 @@ export function JobInputForm({
               </div>
             )}
           </div>
-        )}
-
-        {activeTab === "url" && (
-          <Input
-            type="url"
-            placeholder="https://linkedin.com/in/yourprofile"
-            className="bg-background/50 border-border focus:border-primary"
-            disabled={isLoading || uploadedFile !== null}
-          />
         )}
       </div>
 
