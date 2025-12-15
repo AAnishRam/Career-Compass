@@ -45,6 +45,7 @@ export default function Index() {
 
   // Get recent matches (top 3)
   const recentMatches = jobAnalyses.slice(0, 3).map((job) => ({
+    id: job.id,
     score: job.matchScore,
     title: job.jobTitle,
     company: job.company,

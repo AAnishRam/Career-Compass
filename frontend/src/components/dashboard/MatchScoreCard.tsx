@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface MatchScoreCardProps {
+  id: string;
   score: number;
   title: string;
   company: string;
@@ -10,6 +12,7 @@ interface MatchScoreCardProps {
 }
 
 export function MatchScoreCard({
+  id,
   score,
   title,
   company,
@@ -17,6 +20,7 @@ export function MatchScoreCard({
   tags,
   status,
 }: MatchScoreCardProps) {
+  const navigate = useNavigate();
   const statusColors = {
     excellent: "from-success to-accent",
     good: "from-primary to-chart-4",
@@ -32,7 +36,10 @@ export function MatchScoreCard({
   };
 
   return (
-    <div className="glass-card rounded-xl p-5 hover:shadow-soft transition-all duration-200 group cursor-pointer">
+    <div
+      className="glass-card rounded-xl p-5 hover:shadow-soft transition-all duration-200 group cursor-pointer"
+      onClick={() => navigate(`/results?id=${id}`)}
+    >
       <div className="flex items-start gap-4">
         {/* Score Circle */}
         <div className="relative">

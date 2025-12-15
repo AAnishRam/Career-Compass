@@ -15,6 +15,13 @@
       "when": 1765780803500,
       "tag": "0001_tricky_peter_parker",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1765781844497,
+      "tag": "0002_illegal_blacklash",
+      "breakpoints": true
     }
   ]
 }

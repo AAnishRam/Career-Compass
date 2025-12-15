@@ -22,6 +22,11 @@ export const skillStatusEnum = pgEnum("skill_status", [
   "partial",
   "missing",
 ]);
+export const recommendationStatusEnum = pgEnum("recommendation_status", [
+  "pending",
+  "in_progress",
+  "completed",
+]);
 
 // Users table
 export const users = pgTable("users", {
@@ -89,6 +94,26 @@ export const recommendations = pgTable("recommendations", {
   content: text("content").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// User Recommendation Progress table
+export const userRecommendationProgress = pgTable(
+  "user_recommendation_progress",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    jobAnalysisId: uuid("job_analysis_id")
+      .references(() => jobAnalyses.id, { onDelete: "cascade" })
+      .notNull(),
+    recommendationIndex: integer("recommendation_index").notNull(),
+    status: recommendationStatusEnum("status").notNull().default("pending"),
+    completedAt: timestamp("completed_at"),
+    notes: text("notes"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  }
+);
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
