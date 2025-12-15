@@ -70,6 +70,7 @@ export const skills = pgTable("skills", {
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
   skillName: varchar("skill_name", { length: 255 }).notNull(),
+  category: varchar("category", { length: 100 }),
   proficiencyLevel: integer("proficiency_level").notNull().default(0),
   status: skillStatusEnum("status").notNull().default("missing"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

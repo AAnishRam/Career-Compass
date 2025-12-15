@@ -28,8 +28,8 @@ export function SkillsBreakdown({ skills }: SkillsBreakdownProps) {
   const [expandedSections, setExpandedSections] = useState<
     Record<string, boolean>
   >({
-    "Required Skills": true,
-    "Additional Skills": true,
+    "Required Skills": false,
+    "Additional Skills": false,
   });
 
   const toggleSection = (section: string) => {

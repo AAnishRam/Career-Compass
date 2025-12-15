@@ -1,9 +1,16 @@
 Extract all technical skills, soft skills, and competencies from the following resume.
-Return ONLY a JSON array of skill names, nothing else.
+For each skill, identify its category/domain (e.g., Frontend, Backend, Cloud, Database, DevOps, Soft Skills, etc.).
+Return a JSON array of objects with skill name and category.
 
 RESUME:
 {{resumeContent}}
 
-Example format: ["JavaScript", "React", "Communication", "Project Management"]
+Example format:
+[
+  {"skillName": "React", "category": "Frontend"},
+  {"skillName": "Node.js", "category": "Backend"},
+  {"skillName": "AWS", "category": "Cloud"},
+  {"skillName": "Communication", "category": "Soft Skills"}
+]
 
 Return ONLY the JSON array, no additional text.

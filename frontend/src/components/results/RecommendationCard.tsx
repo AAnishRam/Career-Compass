@@ -104,7 +104,7 @@ export function RecommendationCard({
           </h5>
           <div className="space-y-2">
             {resources.map((resource, index) => {
-              const ResourceIcon = resourceTypeIcons[resource.type];
+              const ResourceIcon = resourceTypeIcons[resource.type] || BookOpen;
               return (
                 <a
                   key={index}

@@ -65,6 +65,7 @@ export interface Skill {
   id: string;
   userId: string;
   skillName: string;
+  category?: string;
   proficiencyLevel: "beginner" | "intermediate" | "advanced" | "expert";
   yearsOfExperience?: number;
   createdAt: string;

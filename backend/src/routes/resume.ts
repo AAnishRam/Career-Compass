@@ -46,7 +46,10 @@ router.post(
       }
 
       // Try to extract skills using Gemini AI (optional - don't fail if this errors)
-      let extractedSkills: string[] = [];
+      let extractedSkills: (
+        | string
+        | { skillName: string; category?: string }
+      )[] = [];
       try {
         extractedSkills = await extractSkillsFromResume(parsedContent);
       } catch (skillError) {
@@ -64,7 +67,9 @@ router.post(
           userId: req.userId!,
           fileName: req.file.originalname,
           parsedContent,
-          skills: extractedSkills,
+          skills: extractedSkills.map((s) =>
+            typeof s === "string" ? s : s.skillName
+          ),
         })
         .returning();
 
@@ -74,7 +79,11 @@ router.post(
           await db.insert(skills).values(
             extractedSkills.map((skill) => ({
               userId: req.userId!,
-              skillName: skill,
+              skillName: typeof skill === "string" ? skill : skill.skillName,
+              category:
+                typeof skill === "string"
+                  ? "General"
+                  : skill.category || "General",
               proficiencyLevel: 70, // Default proficiency
               status: "matched" as const,
             }))
