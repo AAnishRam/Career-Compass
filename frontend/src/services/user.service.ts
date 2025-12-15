@@ -20,17 +20,11 @@ export interface DeleteAccountData {
   password: string;
 }
 
-/**
- * Get current user's profile
- */
 export async function getUserProfile(): Promise<UserProfile> {
   const response = await api.get<UserProfile>("/api/user/profile");
   return response.data;
 }
 
-/**
- * Update user profile
- */
 export async function updateUserProfile(
   data: UpdateProfileData
 ): Promise<UserProfile> {
@@ -38,9 +32,6 @@ export async function updateUserProfile(
   return response.data;
 }
 
-/**
- * Change user password
- */
 export async function changePassword(
   data: ChangePasswordData
 ): Promise<{ message: string }> {
@@ -51,9 +42,6 @@ export async function changePassword(
   return response.data;
 }
 
-/**
- * Export all user data
- */
 export async function exportUserData(): Promise<Blob> {
   const response = await api.get("/api/user/export-data", {
     responseType: "blob",
@@ -61,9 +49,6 @@ export async function exportUserData(): Promise<Blob> {
   return response.data;
 }
 
-/**
- * Delete user account
- */
 export async function deleteUserAccount(
   data: DeleteAccountData
 ): Promise<{ message: string }> {

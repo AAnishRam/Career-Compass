@@ -29,7 +29,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load user and token from localStorage on mount
   useEffect(() => {
     const storedUser = getUser();
     const storedToken = getToken();
@@ -56,7 +55,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const updateUser = (updatedUser: User) => {
     setUser(updatedUser);
-    // Update localStorage
     localStorage.setItem("user", JSON.stringify(updatedUser));
   };
 

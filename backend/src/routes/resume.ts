@@ -10,11 +10,10 @@ import { z } from "zod";
 
 const router = Router();
 
-// Configure multer for file uploads
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: parseInt(process.env.MAX_FILE_SIZE || "10485760"), // 10MB default
+    fileSize: parseInt(process.env.MAX_FILE_SIZE || "10485760"),
   },
   fileFilter: (req, file, cb) => {
     if (file.mimetype === "application/pdf" || file.mimetype === "text/plain") {
@@ -38,14 +37,12 @@ router.post(
 
       let parsedContent = "";
 
-      // Extract text based on file type
       if (req.file.mimetype === "application/pdf") {
         parsedContent = await extractTextFromPDF(req.file.buffer);
       } else {
         parsedContent = req.file.buffer.toString("utf-8");
       }
 
-      // Try to extract skills using Gemini AI (optional - don't fail if this errors)
       let extractedSkills: (
         | string
         | { skillName: string; category?: string }
@@ -57,10 +54,8 @@ router.post(
           "Skill extraction failed, continuing without skills:",
           skillError
         );
-        // Continue without skills - not a critical error
       }
 
-      // Save resume to database
       const [resume] = await db
         .insert(resumes)
         .values({
@@ -73,7 +68,6 @@ router.post(
         })
         .returning();
 
-      // Save skills to skills table (only if we have any)
       if (extractedSkills.length > 0) {
         try {
           await db.insert(skills).values(
@@ -84,13 +78,12 @@ router.post(
                 typeof skill === "string"
                   ? "General"
                   : skill.category || "General",
-              proficiencyLevel: 70, // Default proficiency
+              proficiencyLevel: 70,
               status: "matched" as const,
             }))
           );
         } catch (skillDbError) {
           console.warn("Failed to save skills to database:", skillDbError);
-          // Continue - resume is saved, skills can be added manually
         }
       }
 
@@ -99,7 +92,7 @@ router.post(
           id: resume.id,
           fileName: resume.fileName,
           skillsExtracted: extractedSkills.length,
-          parsedContent: parsedContent.substring(0, 200) + "...", // Preview
+          parsedContent: parsedContent.substring(0, 200) + "...",
         },
         skills: extractedSkills,
         message:
@@ -116,7 +109,6 @@ router.post(
   }
 );
 
-// Add resume as text
 router.post("/text", authenticateToken, async (req: AuthRequest, res) => {
   try {
     const schema = z.object({
@@ -125,10 +117,8 @@ router.post("/text", authenticateToken, async (req: AuthRequest, res) => {
 
     const { content } = schema.parse(req.body);
 
-    // Extract skills using Gemini AI
     const extractedSkills = await extractSkillsFromResume(content);
 
-    // Save resume to database
     const [resume] = await db
       .insert(resumes)
       .values({
@@ -139,7 +129,6 @@ router.post("/text", authenticateToken, async (req: AuthRequest, res) => {
       })
       .returning();
 
-    // Save skills to skills table
     if (extractedSkills.length > 0) {
       await db.insert(skills).values(
         extractedSkills.map((skill) => ({
@@ -170,7 +159,6 @@ router.post("/text", authenticateToken, async (req: AuthRequest, res) => {
   }
 });
 
-// Get user's resume
 router.get("/", authenticateToken, async (req: AuthRequest, res) => {
   try {
     const userResumes = await db
@@ -183,7 +171,6 @@ router.get("/", authenticateToken, async (req: AuthRequest, res) => {
   }
 });
 
-// Delete resume
 router.delete("/:id", authenticateToken, async (req: AuthRequest, res) => {
   try {
     await db.delete(resumes).where(eq(resumes.id, req.params.id));

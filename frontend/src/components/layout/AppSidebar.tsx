@@ -23,7 +23,7 @@ import {
 
 const mainNavItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Projects", url: "/analyze", icon: FileText },
+  { title: "Job Match", url: "/analyze", icon: FileText },
   { title: "Analytics", url: "/results", icon: BarChart3 },
   { title: "Skills", url: "/skills", icon: Target },
   { title: "Recommendations", url: "/recommendations", icon: TrendingUp },

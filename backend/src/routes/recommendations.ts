@@ -26,7 +26,6 @@ router.get("/", authenticateToken, async (req: AuthRequest, res) => {
 
       if (analysisResult && Array.isArray(analysisResult.recommendations)) {
         analysisResult.recommendations.forEach((rec: any, index: number) => {
-          // Handle both old string format and new object format
           if (typeof rec === "string") {
             allRecommendations.push({
               id: `${analysis.id}-${index}`,

@@ -37,7 +37,6 @@ export default function Analyze() {
     mutationFn: analyzeJob,
     onSuccess: (data) => {
       toast.success("Job analysis completed!");
-      // Navigate to results page with the job ID
       navigate(`/results?jobId=${data.id}`);
     },
     onError: (error: any) => {

@@ -7,7 +7,6 @@ import { getPrompt } from "../prompts/index.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load environment variables
 dotenv.config({ path: join(__dirname, "../../.env") });
 
 if (!process.env.GEMINI_API_KEY) {
@@ -63,7 +62,6 @@ export async function analyzeJobMatch(
     const response = await result.response;
     const text = response.text();
 
-    // Extract JSON from response (remove markdown code blocks if present)
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error("Failed to extract JSON from Gemini response");
@@ -91,7 +89,6 @@ export async function extractSkillsFromResume(
     const response = await result.response;
     const text = response.text();
 
-    // Extract JSON array from response
     const jsonMatch = text.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
       throw new Error("Failed to extract skills from Gemini response");

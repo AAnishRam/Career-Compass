@@ -83,7 +83,6 @@ router.post(
 
       const { currentPassword, newPassword } = passwordSchema.parse(req.body);
 
-      // Get user with password
       const [user] = await db
         .select()
         .from(users)
@@ -93,7 +92,6 @@ router.post(
         return res.status(404).json({ error: "User not found" });
       }
 
-      // Verify current password
       const isValidPassword = await bcrypt.compare(
         currentPassword,
         user.passwordHash
@@ -102,10 +100,8 @@ router.post(
         return res.status(401).json({ error: "Current password is incorrect" });
       }
 
-      // Hash new password
       const newPasswordHash = await bcrypt.hash(newPassword, 10);
 
-      // Update password
       await db
         .update(users)
         .set({ passwordHash: newPasswordHash, updatedAt: new Date() })
@@ -127,7 +123,6 @@ router.get("/export-data", authenticateToken, async (req: AuthRequest, res) => {
   try {
     const userId = req.userId!;
 
-    // Fetch all user data
     const [userData] = await db
       .select({
         id: users.id,
@@ -188,7 +183,6 @@ router.delete("/account", authenticateToken, async (req: AuthRequest, res) => {
 
     const { password } = deleteSchema.parse(req.body);
 
-    // Get user with password
     const [user] = await db
       .select()
       .from(users)
@@ -198,13 +192,11 @@ router.delete("/account", authenticateToken, async (req: AuthRequest, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Verify password
     const isValidPassword = await bcrypt.compare(password, user.passwordHash);
     if (!isValidPassword) {
       return res.status(401).json({ error: "Incorrect password" });
     }
 
-    // Delete user (cascade will delete all related data)
     await db.delete(users).where(eq(users.id, req.userId!));
 
     res.json({ message: "Account deleted successfully" });

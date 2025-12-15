@@ -18,16 +18,14 @@ import { getJobAnalyses, getJobAnalysis } from "@/services/jobs.service";
 export default function Results() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const jobId = searchParams.get("id"); // Changed from "jobId" to "id"
+  const jobId = searchParams.get("id");
 
-  // Fetch all job analyses if no specific ID
   const { data: allJobs = [], isLoading: jobsLoading } = useQuery({
     queryKey: ["jobAnalyses"],
     queryFn: getJobAnalyses,
     enabled: !jobId,
   });
 
-  // Fetch specific job analysis if ID provided
   const {
     data: specificJob,
     isLoading: specificJobLoading,
@@ -38,12 +36,8 @@ export default function Results() {
     enabled: !!jobId,
   });
 
-  // Use either the specific job or the most recent one
   const currentJob = specificJob || allJobs[0];
   const isLoading = jobId ? specificJobLoading : jobsLoading;
-
-  // Note: Recommendations are included in the analysis result
-  // No separate fetch needed
 
   if (isLoading) {
     return (
@@ -86,7 +80,6 @@ export default function Results() {
 
   const analysis = currentJob.analysisResult;
 
-  // Use skillsAnalysis if available, otherwise fall back to old format
   const skillsData = analysis.skillsAnalysis
     ? analysis.skillsAnalysis.map((skill) => ({
         name: skill.skill,
@@ -117,7 +110,6 @@ export default function Results() {
         })),
       ];
 
-  // Transform recommendations - handle both old and new format
   const recommendationsData =
     Array.isArray(analysis.recommendations) &&
     analysis.recommendations.length > 0
@@ -138,7 +130,6 @@ export default function Results() {
           }))
       : [];
 
-  // Calculate counts from skillsData for consistency
   const matchedCount = skillsData.filter((s) => s.percentage >= 70).length;
   const partialCount = skillsData.filter(
     (s) => s.percentage >= 40 && s.percentage < 70

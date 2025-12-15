@@ -8,7 +8,6 @@ import { dirname, join } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load environment variables
 dotenv.config({ path: join(__dirname, "../.env") });
 import { testConnection } from "./db/index.js";
 import authRoutes from "./routes/auth.js";
@@ -24,7 +23,6 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(helmet());
 app.use(
   cors({
@@ -70,7 +68,6 @@ app.use(
 // Start server
 async function startServer() {
   try {
-    // Test database connection
     const dbConnected = await testConnection();
     if (!dbConnected) {
       throw new Error("Failed to connect to database");

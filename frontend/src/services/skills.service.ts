@@ -13,25 +13,16 @@ export interface UpdateSkillRequest {
   yearsOfExperience?: number;
 }
 
-/**
- * Get all skills for the current user
- */
 export async function getSkills(): Promise<Skill[]> {
   const response = await api.get<Skill[]>("/api/skills");
   return response.data;
 }
 
-/**
- * Add a new skill
- */
 export async function addSkill(data: AddSkillRequest): Promise<Skill> {
   const response = await api.post<Skill>("/api/skills", data);
   return response.data;
 }
 
-/**
- * Update an existing skill
- */
 export async function updateSkill(
   id: string,
   data: UpdateSkillRequest
@@ -40,9 +31,6 @@ export async function updateSkill(
   return response.data;
 }
 
-/**
- * Delete a skill
- */
 export async function deleteSkill(id: string): Promise<void> {
   await api.delete(`/api/skills/${id}`);
 }

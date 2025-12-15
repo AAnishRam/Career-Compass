@@ -21,7 +21,6 @@ import { getJobAnalyses } from "@/services/jobs.service";
 import { getSkills } from "@/services/skills.service";
 
 export default function Index() {
-  // Fetch dashboard stats
   const {
     data: stats,
     isLoading: statsLoading,
@@ -31,19 +30,16 @@ export default function Index() {
     queryFn: getDashboardStats,
   });
 
-  // Fetch recent job analyses
   const { data: jobAnalyses = [], isLoading: jobsLoading } = useQuery({
     queryKey: ["jobAnalyses"],
     queryFn: getJobAnalyses,
   });
 
-  // Fetch skills
   const { data: skills = [], isLoading: skillsLoading } = useQuery({
     queryKey: ["skills"],
     queryFn: getSkills,
   });
 
-  // Get recent matches (top 3)
   const recentMatches = jobAnalyses.slice(0, 3).map((job) => ({
     id: job.id,
     score: job.matchScore,
@@ -54,7 +50,6 @@ export default function Index() {
     status: job.status,
   }));
 
-  // Get top skills (top 4 by proficiency)
   const topSkills = skills.slice(0, 4).map((skill) => {
     const proficiencyMap = {
       beginner: 25,
@@ -70,7 +65,6 @@ export default function Index() {
     };
   });
 
-  // Calculate average match score
   const averageMatch =
     jobAnalyses.length > 0
       ? Math.round(

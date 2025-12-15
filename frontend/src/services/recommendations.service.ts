@@ -38,9 +38,6 @@ export interface RecommendationFilters {
   search?: string;
 }
 
-/**
- * Get all recommendations for the current user
- */
 export async function getRecommendations(
   filters?: RecommendationFilters
 ): Promise<Recommendation[]> {
@@ -55,9 +52,6 @@ export async function getRecommendations(
   return response.data;
 }
 
-/**
- * Get recommendation statistics
- */
 export async function getRecommendationStats(): Promise<RecommendationStats> {
   const response = await api.get<RecommendationStats>(
     "/api/recommendations/stats"
@@ -65,9 +59,6 @@ export async function getRecommendationStats(): Promise<RecommendationStats> {
   return response.data;
 }
 
-/**
- * Update recommendation status
- */
 export async function updateRecommendationStatus(
   jobAnalysisId: string,
   index: number,

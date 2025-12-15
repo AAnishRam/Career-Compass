@@ -27,9 +27,6 @@ export interface AnalyzeJobResponse {
   };
 }
 
-/**
- * Analyze a job posting against user's resume and skills
- */
 export async function analyzeJob(
   data: AnalyzeJobRequest
 ): Promise<AnalyzeJobResponse> {
@@ -40,25 +37,16 @@ export async function analyzeJob(
   return response.data;
 }
 
-/**
- * Get all job analyses for the current user
- */
 export async function getJobAnalyses(): Promise<JobAnalysis[]> {
   const response = await api.get<JobAnalysis[]>("/api/jobs");
   return response.data;
 }
 
-/**
- * Get a specific job analysis by ID
- */
 export async function getJobAnalysis(id: string): Promise<JobAnalysis> {
   const response = await api.get<JobAnalysis>(`/api/jobs/${id}`);
   return response.data;
 }
 
-/**
- * Delete a job analysis
- */
 export async function deleteJobAnalysis(id: string): Promise<void> {
   await api.delete(`/api/jobs/${id}`);
 }

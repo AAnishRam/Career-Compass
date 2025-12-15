@@ -41,38 +41,31 @@ export default function Settings() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  // Profile state
   const [name, setName] = useState("");
   const [isEditingProfile, setIsEditingProfile] = useState(false);
 
-  // Password state
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // Delete account state
   const [deletePassword, setDeletePassword] = useState("");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  // Fetch user profile
   const { data: profile, isLoading } = useQuery({
     queryKey: ["user-profile"],
     queryFn: getUserProfile,
   });
 
-  // Set initial name when profile loads
   useEffect(() => {
     if (profile?.name) {
       setName(profile.name);
     }
   }, [profile]);
 
-  // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: updateUserProfile,
     onSuccess: (data) => {
       queryClient.setQueryData(["user-profile"], data);
-      // Update AuthContext to reflect changes in sidebar
       updateUser({
         id: data.id,
         name: data.name,
@@ -85,7 +78,6 @@ export default function Settings() {
     },
   });
 
-  // Change password mutation
   const changePasswordMutation = useMutation({
     mutationFn: changePassword,
     onSuccess: () => {
@@ -99,7 +91,6 @@ export default function Settings() {
     },
   });
 
-  // Export data mutation
   const exportDataMutation = useMutation({
     mutationFn: exportUserData,
     onSuccess: (blob) => {
@@ -118,7 +109,6 @@ export default function Settings() {
     },
   });
 
-  // Delete account mutation
   const deleteAccountMutation = useMutation({
     mutationFn: deleteUserAccount,
     onSuccess: () => {

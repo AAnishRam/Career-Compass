@@ -39,7 +39,6 @@ export default function Recommendations() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const queryClient = useQueryClient();
 
-  // Fetch recommendations with filters
   const {
     data: recommendations = [],
     isLoading,
@@ -55,13 +54,11 @@ export default function Recommendations() {
       }),
   });
 
-  // Fetch stats
   const { data: stats } = useQuery({
     queryKey: ["recommendation-stats"],
     queryFn: getRecommendationStats,
   });
 
-  // Mutation for updating status
   const updateStatusMutation = useMutation({
     mutationFn: ({
       jobAnalysisId,
@@ -90,7 +87,6 @@ export default function Recommendations() {
     });
   };
 
-  // Group recommendations by priority
   const groupedRecommendations = {
     high: recommendations.filter((r) => r.priority === "high"),
     medium: recommendations.filter((r) => r.priority === "medium"),

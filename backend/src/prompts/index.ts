@@ -5,21 +5,12 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-/**
- * Available prompt template names
- */
 export type PromptName = "job-analysis" | "skills-extraction";
 
-/**
- * Variables that can be used in prompt templates
- */
 export interface PromptVariables {
   [key: string]: string;
 }
 
-/**
- * Cache for loaded prompt templates
- */
 const promptCache = new Map<PromptName, string>();
 
 /**

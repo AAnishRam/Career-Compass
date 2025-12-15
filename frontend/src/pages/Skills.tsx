@@ -20,7 +20,6 @@ import { Link } from "react-router-dom";
 export default function Skills() {
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch user's skills
   const {
     data: skills = [],
     isLoading,
@@ -30,12 +29,10 @@ export default function Skills() {
     queryFn: getSkills,
   });
 
-  // Filter skills based on search
   const filteredSkills = skills.filter((skill) =>
     skill.skillName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Calculate stats
   const totalSkills = skills.length;
   const masteredSkills = skills.filter(
     (s) => s.proficiencyLevel === "expert" || s.proficiencyLevel === "advanced"
@@ -65,7 +62,6 @@ export default function Skills() {
     },
   ];
 
-  // Group skills by category
   const categories = [
     ...new Set(filteredSkills.map((s) => s.category || "General")),
   ];
