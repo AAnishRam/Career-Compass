@@ -1,26 +1,47 @@
 # Career Compass Backend
 
-Backend API for Career Compass - AI-powered career guidance platform.
+The robust, AI-driven backend API for the Career Compass platform. This service handles the complex logic of resume parsing, job analysis, and intelligent matching, serving as the bridge between user data and our AI models.
 
-## Features
+## 🌟 Unique Value Propositions
 
-- 🔐 JWT Authentication
-- 📄 Resume Upload (PDF & Text)
-- 🤖 AI-Powered Job Analysis (Gemini API)
-- 📊 Skills Management
-- 💡 Personalized Recommendations
-- 📈 Dashboard Statistics
+- **AI-Native Architecture**: Built from the ground up to integrate with Large Language Models (LLMs), specifically Google's Gemini Pro, for nuanced text understanding.
+- **Serverless Database**: Utilizes NeonDB (PostgreSQL) for scalable, serverless data management.
+- **Secure & Private**: Implements industry-standard security practices including JWT authentication and secure password hashing.
 
-## Tech Stack
+## ✨ Key Features
 
-- **Runtime:** Node.js with TypeScript
-- **Framework:** Express.js
-- **Database:** NeonDB (Serverless PostgreSQL)
-- **ORM:** Drizzle ORM
-- **AI:** Google Gemini API
-- **PDF Parsing:** PDF.js
+### 🔐 Secure Identity Management
 
-## Setup Instructions
+- **JWT Authentication**: Stateless, secure user sessions.
+- **Bcrypt Hashing**: Industry-standard password encryption.
+- **Rate Limiting**: Protection against brute-force and DDoS attacks.
+
+### 🤖 AI Engine (Google Gemini)
+
+- **Deep Contextual Analysis**: Uses Gemini Pro to "read" job descriptions like a human recruiter would.
+- **Semantic Matching**: Matches resumes to jobs based on meaning, not just keywords.
+- **Prompt Engineering**: Custom-tuned prompts to extract structured JSON data from unstructured text.
+
+### 📄 Document Processing
+
+- **PDF Parsing**: Robust PDF text extraction using `pdfjs-dist`.
+- **Intelligent Formatting**: Cleans and normalizes text for optimal AI processing.
+
+### 📊 Data Management
+
+- **Skills Tracking**: Dynamic CRUD operations for user skills.
+- **Historical Analysis**: Stores and retrieves past job analyses for progress tracking.
+
+## 🏗️ Tech Stack
+
+- **Runtime**: [Node.js](https://nodejs.org/) with [TypeScript](https://www.typescriptlang.org/) for type safety.
+- **Framework**: [Express.js](https://expressjs.com/) for RESTful API routing.
+- **Database**: [NeonDB](https://neon.tech/) (Serverless PostgreSQL).
+- **ORM**: [Drizzle ORM](https://orm.drizzle.team/) for type-safe database queries.
+- **AI Model**: [Google Gemini API](https://ai.google.dev/) (generative-ai).
+- **Validation**: [Zod](https://zod.dev/) for strict runtime schema validation.
+
+## 🚀 Setup Instructions
 
 ### 1. Install Dependencies
 
@@ -29,129 +50,63 @@ cd backend
 npm install
 ```
 
-### 2. Configure Environment Variables
+### 2. Environment Configuration
 
-Copy `.env.example` to `.env` and fill in your credentials:
+Create a `.env` file in the root directory (copy from `.env.example`):
 
 ```bash
 cp .env.example .env
 ```
 
-Required environment variables:
+**Required Variables:**
 
-- `DATABASE_URL` - Your NeonDB connection string
-- `GEMINI_API_KEY` - Your Google Gemini API key
-- `JWT_SECRET` - A random secret string for JWT tokens
+- `DATABASE_URL`: Your NeonDB connection string.
+- `GEMINI_API_KEY`: API key from [Google AI Studio](https://makersuite.google.com/app/apikey).
+- `JWT_SECRET`: Secure random string for token signing.
+- `PORT`: (Optional) Server port, defaults to 3000.
 
-### 3. Setup NeonDB
+### 3. Database Setup
 
-1. Go to [Neon.tech](https://neon.tech) and create an account
-2. Create a new project
-3. Copy the connection string (it looks like: `postgresql://user:password@host/database?sslmode=require`)
-4. Paste it in your `.env` file as `DATABASE_URL`
+We use Drizzle Kit for database migrations.
 
-### 4. Get Gemini API Key
-
-1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Create an API key
-3. Paste it in your `.env` file as `GEMINI_API_KEY`
-
-### 5. Generate Database Schema
+**Generate Migrations:**
 
 ```bash
 npm run db:generate
 ```
 
-### 6. Run Migrations
+**Apply Migrations:**
 
 ```bash
 npm run db:migrate
 ```
 
-### 7. Start Development Server
+### 4. Start the Server
+
+**Development Mode (Hot Reload):**
 
 ```bash
 npm run dev
 ```
 
-The server will start on `http://localhost:3000`
+**Production Build:**
 
-## API Endpoints
-
-### Authentication
-
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user
-
-### Resume
-
-- `POST /api/resume/upload` - Upload PDF resume
-- `POST /api/resume/text` - Add resume as text
-- `GET /api/resume` - Get user's resumes
-- `DELETE /api/resume/:id` - Delete resume
-
-### Jobs
-
-- `POST /api/jobs/analyze` - Analyze job posting
-- `GET /api/jobs` - Get all job analyses
-- `GET /api/jobs/:id` - Get specific job analysis
-- `DELETE /api/jobs/:id` - Delete job analysis
-
-### Skills
-
-- `GET /api/skills` - Get all skills
-- `POST /api/skills` - Add new skill
-- `PUT /api/skills/:id` - Update skill
-- `DELETE /api/skills/:id` - Delete skill
-
-### Recommendations
-
-- `GET /api/recommendations` - Get all recommendations
-- `GET /api/recommendations/:jobId` - Get recommendations for job
-
-### Stats
-
-- `GET /api/stats/dashboard` - Get dashboard statistics
-
-## Scripts
-
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Build for production
-- `npm start` - Start production server
-- `npm run db:generate` - Generate database migrations
-- `npm run db:migrate` - Run database migrations
-- `npm run db:studio` - Open Drizzle Studio (database GUI)
+```bash
+npm run build
+npm start
+```
 
 ## Project Structure
 
 ```
 backend/
 ├── src/
-│   ├── db/
-│   │   ├── index.ts          # Database connection
-│   │   ├── schema.ts         # Database schema
-│   │   └── migrate.ts        # Migration runner
-│   ├── middleware/
-│   │   └── auth.ts           # JWT authentication
-│   ├── routes/
-│   │   ├── auth.ts           # Auth routes
-│   │   ├── jobs.ts           # Job analysis routes
-│   │   ├── resume.ts         # Resume routes
-│   │   ├── skills.ts         # Skills routes
-│   │   ├── recommendations.ts # Recommendations routes
-│   │   └── stats.ts          # Statistics routes
-│   ├── services/
-│   │   ├── gemini.ts         # Gemini AI service
-│   │   └── pdfParser.ts      # PDF parsing service
-│   ├── utils/
-│   │   └── auth.ts           # Auth utilities
-│   └── index.ts              # Main server file
-├── drizzle/                  # Generated migrations
-├── .env.example              # Environment template
-├── package.json
-└── tsconfig.json
+│   ├── db/            # Database schema & connection
+│   ├── middleware/    # Auth, Validation, Error handling
+│   ├── routes/        # API Route definitions
+│   ├── services/      # Business logic (Gemini, PDF Parser)
+│   ├── utils/         # Helper functions
+│   └── index.ts       # Application entry point
+├── drizzle/           # Migration files
+└── package.json
 ```
-
-## License
-
-MIT
