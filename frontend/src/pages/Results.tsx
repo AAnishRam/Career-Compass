@@ -181,32 +181,32 @@ export default function Results() {
           </div>
         </div>
 
-        {/* Job Description Card */}
-        <div className="glass-card rounded-xl overflow-hidden">
-          <button
-            onClick={() => setIsJobDescExpanded(!isJobDescExpanded)}
-            className="w-full p-6 flex items-center justify-between hover:bg-accent/5 transition-colors"
-          >
-            <h2 className="text-xl font-display font-semibold text-foreground">
-              Job Description
-            </h2>
-            {isJobDescExpanded ? (
-              <ChevronUp className="h-5 w-5 text-muted-foreground" />
-            ) : (
-              <ChevronDown className="h-5 w-5 text-muted-foreground" />
-            )}
-          </button>
-          {isJobDescExpanded && (
-            <div className="px-6 pb-6 border-t border-border/50">
-              <div className="pt-4 text-sm text-muted-foreground whitespace-pre-wrap">
-                {currentJob.jobDescription}
-              </div>
-            </div>
-          )}
-        </div>
-
         {/* Main Content - Single Column Layout */}
         <div className="max-w-4xl mx-auto space-y-6">
+          {/* Job Description Card */}
+          <div className="glass-card rounded-xl overflow-hidden">
+            <button
+              onClick={() => setIsJobDescExpanded(!isJobDescExpanded)}
+              className="w-full p-6 flex items-center justify-between hover:bg-accent/5 transition-colors"
+            >
+              <h2 className="text-xl font-display font-semibold text-foreground">
+                Job Description
+              </h2>
+              {isJobDescExpanded ? (
+                <ChevronUp className="h-5 w-5 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-muted-foreground" />
+              )}
+            </button>
+            {isJobDescExpanded && (
+              <div className="px-6 pb-6 border-t border-border/50">
+                <div className="pt-4 text-sm text-muted-foreground whitespace-pre-wrap">
+                  {currentJob.jobDescription}
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* 1. Match Overview Card */}
           <MatchOverview
             overallScore={currentJob.matchScore}
