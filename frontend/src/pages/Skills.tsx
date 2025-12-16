@@ -16,9 +16,11 @@ import { useQuery } from "@tanstack/react-query";
 import { getSkills } from "@/services/skills.service";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { AddSkillDialog } from "@/components/skills/AddSkillDialog";
 
 export default function Skills() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const {
     data: skills = [],
@@ -114,7 +116,10 @@ export default function Skills() {
               Track and manage your skill levels
             </p>
           </div>
-          <Button className="gradient-primary text-primary-foreground gap-2 w-full sm:w-auto">
+          <Button
+            className="gradient-primary text-primary-foreground gap-2 w-full sm:w-auto"
+            onClick={() => setIsAddDialogOpen(true)}
+          >
             <Plus className="h-4 w-4" />
             Add Skill
           </Button>
@@ -224,6 +229,12 @@ export default function Skills() {
           </div>
         )}
       </div>
+
+      {/* Add Skill Dialog */}
+      <AddSkillDialog
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+      />
     </MainLayout>
   );
 }

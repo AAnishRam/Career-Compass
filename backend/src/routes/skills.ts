@@ -27,6 +27,7 @@ router.post("/", authenticateToken, async (req: AuthRequest, res) => {
       skillName: z.string().min(1),
       proficiencyLevel: z.number().min(0).max(100).default(50),
       status: z.enum(["matched", "partial", "missing"]).default("matched"),
+      category: z.string().optional().nullable(),
     });
 
     const data = schema.parse(req.body);

@@ -3,8 +3,9 @@ import { Skill } from "../types";
 
 export interface AddSkillRequest {
   skillName: string;
-  proficiencyLevel: "beginner" | "intermediate" | "advanced" | "expert";
-  yearsOfExperience?: number;
+  proficiencyLevel: number; // 0-100
+  status?: "matched" | "partial" | "missing";
+  category?: string | null;
 }
 
 export interface UpdateSkillRequest {
