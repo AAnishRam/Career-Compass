@@ -82,7 +82,7 @@ export default function Login() {
               <Input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="Email"
                 {...register("email")}
                 disabled={isLoading}
               />
@@ -97,7 +97,7 @@ export default function Login() {
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder="Password"
                 {...register("password")}
                 disabled={isLoading}
               />
