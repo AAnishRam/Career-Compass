@@ -10,7 +10,10 @@ import {
   RotateCcw,
   ArrowLeft,
   AlertCircle,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
+import { useState } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getJobAnalyses, getJobAnalysis } from "@/services/jobs.service";
@@ -19,6 +22,7 @@ export default function Results() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const jobId = searchParams.get("id");
+  const [isJobDescExpanded, setIsJobDescExpanded] = useState(false);
 
   const { data: allJobs = [], isLoading: jobsLoading } = useQuery({
     queryKey: ["jobAnalyses"],
@@ -175,6 +179,30 @@ export default function Results() {
               <span className="hidden sm:inline">Export PDF</span>
             </Button>
           </div>
+        </div>
+
+        {/* Job Description Card */}
+        <div className="glass-card rounded-xl overflow-hidden">
+          <button
+            onClick={() => setIsJobDescExpanded(!isJobDescExpanded)}
+            className="w-full p-6 flex items-center justify-between hover:bg-accent/5 transition-colors"
+          >
+            <h2 className="text-xl font-display font-semibold text-foreground">
+              Job Description
+            </h2>
+            {isJobDescExpanded ? (
+              <ChevronUp className="h-5 w-5 text-muted-foreground" />
+            ) : (
+              <ChevronDown className="h-5 w-5 text-muted-foreground" />
+            )}
+          </button>
+          {isJobDescExpanded && (
+            <div className="px-6 pb-6 border-t border-border/50">
+              <div className="pt-4 text-sm text-muted-foreground whitespace-pre-wrap">
+                {currentJob.jobDescription}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Main Content - Single Column Layout */}
