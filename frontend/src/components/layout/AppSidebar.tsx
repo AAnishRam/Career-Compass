@@ -12,6 +12,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import logoImage from "@/assests/logo.png";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -85,7 +86,10 @@ export function AppSidebar({ isOpen, onClose, onToggle }: AppSidebarProps) {
       >
         <div className="flex h-full flex-col">
           {/* Logo */}
-          <div className="flex items-center gap-2.5 px-5 py-5">
+          <Link
+            to="/"
+            className="flex items-center gap-2.5 px-5 py-5 hover:opacity-80 transition-opacity"
+          >
             <img
               src={logoImage}
               alt="Career Compass Logo"
@@ -94,7 +98,7 @@ export function AppSidebar({ isOpen, onClose, onToggle }: AppSidebarProps) {
             <h1 className="font-display text-base font-bold text-foreground">
               Career Compass
             </h1>
-          </div>
+          </Link>
 
           {/* Main Navigation */}
           <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
